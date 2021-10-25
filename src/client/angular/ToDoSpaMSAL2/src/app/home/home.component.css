@@ -1,0 +1,19 @@
+table {
+     width: 70%;
+     margin: 3% auto auto auto;
+   }
+ 
+ .card-section {
+     margin: 2%;
+     padding: 2%;
+ }
+
+ .card-button {
+    margin: 2%;
+    padding: 0%;
+  }
+ 
+ button {
+     margin: 0 auto;
+     display: block;
+ }

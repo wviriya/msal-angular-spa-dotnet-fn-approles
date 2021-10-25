@@ -1,0 +1,17 @@
+{
+     "spa":  {
+          "redirectUris": ["__replyUrl__"]
+     },
+     "web":  {
+          "implicitGrantSettings": {
+               "enableIdTokenIssuance": false,
+               "enableAccessTokenIssuance": false
+          }
+     }
+}
+
+
+
+
+
+

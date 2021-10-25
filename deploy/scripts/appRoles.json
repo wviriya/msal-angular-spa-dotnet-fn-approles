@@ -1,0 +1,30 @@
+{
+     "appRoles": [
+		{
+			"allowedMemberTypes": [
+				"User"
+			],
+			"description": "Task Admin",
+			"displayName": "TaskAdmin",
+			"id": "a1891150-773b-4fcf-8822-af6ce0294805",
+			"isEnabled": true,
+			"lang": null,
+			"origin": "Application",
+			"value": "TaskAdmin"
+		},
+		{
+			"allowedMemberTypes": [
+				"User"
+			],
+			"description": "Task User",
+			"displayName": "TaskUser",
+			"id": "65449823-f73f-4ab9-adf0-8919aca94145",
+			"isEnabled": true,
+			"lang": null,
+			"origin": "Application",
+			"value": "TaskUser"
+		}
+	]
+ }
+
+

@@ -1,0 +1,86 @@
+name: CI/CD for Http trigger Function and import Function API to API Management Service
+on: 
+  workflow_dispatch:
+    inputs:
+      ENVIRONMENT_TYPE: 
+        description: 'Environment: dev, test, or prod'
+        required: true
+        default: 'test'
+      APP_NAME_PREFIX: 
+        description: 'Prefix to be used in naming Azure resources'
+        required: true
+        default: 'wvapim'
+      RESOURCE_GROUP_NAME: 
+        description: 'Resource Group where Azure resources are located'
+        required: true
+        default: 'wvapim-test-rg'
+      FUNCTION_NAME: 
+        description: 'Azure Functions name'
+        required: true
+        default: 'fn-wvapim-test'
+      ORIGIN_URL: 
+        description: 'Client app URL' # This is CDN endpoint URL
+        required: true
+        default: 'https://wvapim-test.azureedge.net'              
+  
+# CONFIGURATION
+# For help, go to https://github.com/Azure/Actions
+#
+# 1. Set up the following secrets in your repository:
+#   AZURE_CREDENTIALS
+#
+# 2. Change below variables for your configuration:
+env:
+  ENVIRONMENT_TYPE: ${{ github.event.inputs.ENVIRONMENT_TYPE }}
+  APP_NAME_PREFIX: ${{ github.event.inputs.APP_NAME_PREFIX }}
+  RESOURCE_GROUP_NAME: ${{ github.event.inputs.RESOURCE_GROUP_NAME }}
+  FUNCTION_NAME: ${{ github.event.inputs.FUNCTION_NAME }}
+  APP_SOURCE_PATH: 'src'
+  FUNCTIONAPP_PATH: 'api/dotnet/ToDoFunctionApp'
+  DOTNET_VERSION: '3.1.410'
+  BICEP_FILE_PATH: 'deploy'
+  BICEP_FILE_NAME: 'api'
+
+jobs:
+  function_cicd:
+    runs-on: ubuntu-latest
+    steps:
+    # Authentication
+    # Set up the following secrets in your repository: AZURE_CREDENTIALS
+    # For details on usage of secrets, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS  }}
+    
+    # Checkout
+    - name: Checkout
+      uses: actions/checkout@v1
+  
+    # Setup .NET Core environment
+    - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Build .NET application
+    - name: 'Build .NET application'
+      shell: bash
+      run: | 
+        pushd ./${{ env.APP_SOURCE_PATH }}/${{ env.FUNCTIONAPP_PATH }}
+        dotnet build --configuration Release --output ./outputs
+        popd
+
+    # Publish .NET application to Azure Function
+    - name: Publish to Azure Functions to ${{ env.FUNCTION_NAME }}
+      uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: ${{ env.FUNCTION_NAME }}
+        package: ./${{ env.APP_SOURCE_PATH }}/${{ env.FUNCTIONAPP_PATH }}/outputs
+
+    # Azure logout
+    - name: logout
+      run: |
+            az logout
+      if: always()
