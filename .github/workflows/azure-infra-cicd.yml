@@ -1,4 +1,4 @@
-name: CI/CD for Serverless Web Application using Bicep
+name: CI/CD for Deploying Azure Infrastructure
 on: 
   workflow_dispatch:
     inputs:
@@ -13,11 +13,11 @@ on:
       APP_NAME_PREFIX: 
         description: 'Prefix to be used in naming Azure resources'
         required: true
-        default: 'wvapim'
+        default: 'wvmsal'
       RESOURCE_GROUP_NAME: 
         description: 'Resource Group to deploy Azure resources'
         required: true
-        default: 'wvapim-test-rg'
+        default: 'wvmsal-test-rg'
       MSI_NAME: 
         description: 'User Managed Identity'
         required: true

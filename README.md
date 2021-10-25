@@ -1,24 +1,15 @@
-# Serverless web application
+# Architecture
 
-This sample references an architecture of a [serverless web application](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/serverless/web-app). The application serves static Angular.JS content from Azure Blob Storage (Static Website), and implements REST APIs for CRUD of a to do list with Azure Functions. The API reads data from Cosmos DB and returns the results to the web app. The GitHub workflow uses Azure Bicep for Infrastructure as Code to deploy and configure Azure resources.
+This solution serves static Angular.JS content from Azure Blob Storage (Static Website), and implements REST APIs for CRUD of a to do list with Azure Functions. The API reads data from Cosmos DB and returns the results to the web app. The GitHub workflow uses Azure Bicep for Infrastructure as Code to deploy and configure Azure resources.
 
-![Architecture Diagram](./media/serverless-web-app.png)
+## MSAL Authorization code flow
 
-## Security
+The Single-page application (SPA) uses MSAL for JavaScript v2.0 with Authorization Code Flow. You can choose between Implicit flow and Authorization code flow for SPA and API pattern. I choose the Authorization Code Flow because it's more secure. The built-in authentication (Easy Auth) on Azure Functions is enabled for Authentication and authorization. In order for the authentication to work, the GitHub workflow uses AZ CLI to register the applications on Azure Active Directory and configure permissions between the SPA and API. Azure Functions also implement CORS policy to allow only traffic from the client origin to access the API. To connect to Cosmos DB, Azure Functions uses Managed Identity to read connection strings stored in Azure Key Vault.
 
-The Single-page application (SPA) uses MSAL for JavaScript v2.0 with Authorization Code Flow. You can choose between Implicit flow and Authorization code flow for SPA and API pattern. I choose the Authorization Code Flow because it's more secure. The built-in authentication (Easy Auth) on Azure Functions is enabled for Authentication and authorization. In order for the authentication to work, the GitHub workflow uses AZ CLI to register the applications on Azure Active Directory and configure permissions between the SPA and API. Both Azure API Manager and Functions also implement CORS policy to allow only traffic from the client origin to access the API. Azure Functions has network access restriction is enabled to allow only traffic from API Management's IP address to make the request. To connect to Cosmos DB, Azure Functions uses Managed Identity to read connection strings stored in Azure Key Vault.
+Both SPA and API each has app roles assigned to them. There are two application roles:
 
-## Azure Functions HTTP Trigger and OpenAPI documents
-
-On APIM, there are two approaches to import Azure Functions as API.
-
-1. Azure backend integration.
-
-    This is done through adding backend services of your Functions. This uses Functions' app key to access functions. The Bicep module [apimAPI.bicep](./deploy/modules/apimAPI.bicep) demonstrates how deploy this.
-
-1. OpenAPI specification.
-
-    By default, Azure Functions HTTP Trigger does not follow OpenAPI standard. [OpenAPI extension](https://github.com/Azure/azure-functions-openapi-extension/blob/main/docs/.enable-open-api-endpoints-in-proc.md) is required to enable OpenAPI documents. The Bicep module [apimOpenAPI.bicep](./deploy/modules/apimOpenAPI.bicep) demonstrates how deploy this.
+- TaskUser - This role has access to only user own tasks.
+- TaskAdmin - This role has access to all tasks in the database.
 
 ## Prerequisites
 
@@ -27,14 +18,12 @@ On APIM, there are two approaches to import Azure Functions as API.
 1. [User-assigned managed identity (MSI)](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azp#create-a-user-assigned-managed-identity) with Contributor role. This will be used for executing Deployment Scripts in Bicep.
 1. A Service Principal with Contributor role at subscription scope. This is the identity that will be used to access the Azure resources from GitHub Action. If you don't have a Service Principal, create one by following [these steps](https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure). The Service Principal also requires [Read/Write permissions to Azure Graph API](https://docs.microsoft.com/en-us/graph/notifications-integration-app-registration#api-permissions).
 
-## About sample workflows:
+## About sample workflows
 
 This repo contains three GitHub workflows:
 
 * [Create Azure Resource (IaC)](.github/workflows/azure-infra-cicd.yml) workflow validates Bicep files and creates Azure resources necessary to host the sample solution. The Bicep file will create the following resources as a pre-requisite to the next two workflows:
 
-    - Azure API Management.
-    - Azure CDN.
     - Azure CosmosDB (MongolDB API).
     - Azure Functions (Windows).
     - Azure Key Vault option to BYO.
@@ -55,14 +44,13 @@ This repo contains three GitHub workflows:
 ## References
 
 * [Azure Bicep](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview)
-* [Protect a web API backend in Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-protect-backend-with-aad)
 * [Host a RESTful API with CORS in Azure App Service](https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-rest-api)
 * [Authentication and Authorization flow single-page application](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-overview)
 * [Azure Functions and App Services built-in authentication](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization)
-* [API Management cross domain policies](https://docs.microsoft.com/en-us/azure/api-management/api-management-cross-domain-policies#AllowCrossDomainCalls)
 * [Azure Functions and App Services network access restriction](https://docs.microsoft.com/en-us/azure/app-service/networking-features#access-restrictions)
 * [Use Key Vault from App Service with Azure Managed Identity](https://docs.microsoft.com/en-us/samples/azure-samples/app-service-msi-keyvault-dotnet/keyvault-msi-appservice-sample/)
 * [Tutorial: Sign in users and call the Microsoft Graph API from a JavaScript single-page app (SPA) using auth code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/tutorial-v2-javascript-auth-code)
+* [Add app roles in your application](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps)
 
 ## License
 
