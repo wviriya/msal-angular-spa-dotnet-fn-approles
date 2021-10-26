@@ -65,6 +65,24 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
+    # Run PowerShell script analyzer
+    - name: Run PSScriptAnalyzer
+      uses: microsoft/psscriptanalyzer-action@2044ae068e37d0161fa2127de04c19633882f061
+      with:
+        # Check https://github.com/microsoft/action-psscriptanalyzer for more info about the options.
+        # The below set up runs PSScriptAnalyzer to your entire repository and runs some basic security rules.
+        path: .\${{ env.BICEP_FILE_PATH }}\scripts
+        recurse: true 
+        # Include your own basic security rules. Removing this option will run all the rules 
+        includeRule: '"PSAvoidGlobalAliases", "PSAvoidUsingConvertToSecureStringWithPlainText"'
+        output: results.sarif
+      
+    # Upload the SARIF file generated in the previous step
+    - name: Upload SARIF results file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: results.sarif
+
     # Run app registration against AAD using PowerShell script
     - name: 'App Registration'
       id: appRegistration
@@ -98,6 +116,12 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     
+    # Initialize the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: javascript # go, javascript, csharp, python, cpp, java
+
     # Build Angular application
     - name: Build Angular application
       run: |
@@ -106,6 +130,10 @@ jobs:
         npm install -g @angular/cli
         ng build -c=production --output-path=./dist
         popd
+
+    # Running CodeQL scan
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
     
     # Deploy Angular application to Storage Account
     - name: Publish static website to Azure storage account ${{ env.AZURE_STORAGE_NAME }}
