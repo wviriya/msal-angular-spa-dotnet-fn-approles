@@ -17,7 +17,7 @@ on:
       CLIENT_URL: 
         description: 'Client URL'
         required: true
-        default: 'https://wvmsal.z8.web.core.windows.net'
+        default: 'https://wvmsaltest.z8.web.core.windows.net'
       API_URL: 
         description: 'API on APIM URL'
         required: true
