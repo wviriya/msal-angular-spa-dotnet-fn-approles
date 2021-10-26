@@ -115,12 +115,6 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ env.NODE_VERSION }}
-    
-    # Initialize the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: javascript # go, javascript, csharp, python, cpp, java
 
     # Build Angular application
     - name: Build Angular application
@@ -130,10 +124,6 @@ jobs:
         npm install -g @angular/cli
         ng build -c=production --output-path=./dist
         popd
-
-    # Running CodeQL scan
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
     
     # Deploy Angular application to Storage Account
     - name: Publish static website to Azure storage account ${{ env.AZURE_STORAGE_NAME }}
