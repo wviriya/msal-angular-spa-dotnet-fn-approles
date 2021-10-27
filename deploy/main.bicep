@@ -38,6 +38,7 @@ var appServicePlanName = 'asp-${appNameSuffix}-${environmentType}'
 var appInsightsName = 'ai-${appNameSuffix}-${environmentType}'
 var cosmosDbName = '${appNameSuffix}-${environmentType}'
 var cosmosDbAccountName = 'cosmos-${appNameSuffix}-${environmentType}'
+var password = 'DummyPassword1234'
 
 // SKUs
 var functionSku = environmentType == 'prod' ? 'EP1' : 'Y1'
