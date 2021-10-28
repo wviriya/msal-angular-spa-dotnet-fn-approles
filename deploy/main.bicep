@@ -38,7 +38,7 @@ var appServicePlanName = 'asp-${appNameSuffix}-${environmentType}'
 var appInsightsName = 'ai-${appNameSuffix}-${environmentType}'
 var cosmosDbName = '${appNameSuffix}-${environmentType}'
 var cosmosDbAccountName = 'cosmos-${appNameSuffix}-${environmentType}'
-var password = 'DummyPassword1234'
+var sasToken = 'DefaultEndpointsProtocol=https;AccountName=wvapimtest;AccountKey=M+ouaabr5oz5ZLs9viSiyUggxzdDsQs0SZHJs29JXeLiIr1u+JXFH28LKhGt4/jHYmVY9h/e+Z9P2+/idfNymg==;EndpointSuffix=core.windows.net'
 
 // SKUs
 var functionSku = environmentType == 'prod' ? 'EP1' : 'Y1'
